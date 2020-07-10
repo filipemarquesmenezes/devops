@@ -1,23 +1,15 @@
 FROM ubuntu:latest
 
-RUN apt-get update && \
-    apt-get install -yq --no-install-recommends wget pwgen ca-certificates && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+ENV TZ=America/Sao_Paulo
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+RUN apt-get update && apt-get upgrade
 
 # Install dependencies
-RUN apt-get update && \
-apt-get install -y git build-essential curl wget software-properties-common zip unzip
+RUN apt-get install -y git curl wget jq
 
 # Install JDK 8
-RUN \
-echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
-add-apt-repository -y ppa:webupd8team/java && \
-apt-get update && \
-apt-get install -y oracle-java8-installer wget unzip tar && \
-rm -rf /var/lib/apt/lists/* && \
-rm -rf /var/cache/oracle-jdk8-installer
+RUN apt -y install openjdk-8-jdk openjdk-8-jre
 
-# Define commonly used JAVA_HOME variable
-ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
+# cleanup
+RUN apt-get autoremove -y
